@@ -197,16 +197,18 @@ func (b *Builder) generateBruteItems(engine *Engine) error {
 				}
 
 				item := &BruteItem{
-					Type:     target.Type,
-					Target:   target.Host,
-					Port:     target.Port,
-					Username: username,
-					Password: password,
-					Context:  b.ctx,
-					Timeout:  b.config.Timeout,
-					Extra:    make(map[string]string),
+					AllowBlankUsername: b.config.AllowBlankUsername,
+					AllowBlankPassword: b.config.AllowBlankPassword,
+					Type:               target.Type,
+					Target:             target.Host,
+					Port:               target.Port,
+					Username:           username,
+					Password:           password,
+					Context:            b.ctx,
+					Timeout:            b.config.Timeout,
+					Extra:              make(map[string]string),
 				}
-				
+
 				if err := engine.Feed(item); err != nil {
 					return fmt.Errorf("failed to feed brute item: %w", err)
 				}

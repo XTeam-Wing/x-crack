@@ -50,9 +50,11 @@ type BruteConfig struct {
 	DefaultPassDict []string `yaml:"default_pass_dict"`
 
 	// 其他设置
-	SkipEmptyPassword bool `yaml:"skip_empty_password"`
-	SkipEmptyUsername bool `yaml:"skip_empty_username"`
-	OnlyNeedPassword  bool `yaml:"only_need_password"`
+	SkipEmptyPassword  bool `yaml:"skip_empty_password"`
+	SkipEmptyUsername  bool `yaml:"skip_empty_username"`
+	OnlyNeedPassword   bool `yaml:"only_need_password"`
+	AllowBlankUsername bool `yaml:"allow_blank_username"` // 允许空用户名
+	AllowBlankPassword bool `yaml:"allow_blank_password"` // 允许空密码
 }
 
 // OutputConfig 输出配置

@@ -8,14 +8,16 @@ import (
 
 // BruteItem 表示一个爆破任务项
 type BruteItem struct {
-	Type     string            `json:"type"`     // 服务类型 (ssh, ftp, mysql, etc.)
-	Target   string            `json:"target"`   // 目标地址
-	Username string            `json:"username"` // 用户名
-	Password string            `json:"password"` // 密码
-	Port     int               `json:"port"`     // 端口
-	Context  context.Context   `json:"-"`        // 上下文
-	Timeout  time.Duration     `json:"timeout"`  // 超时时间
-	Extra    map[string]string `json:"extra"`    // 额外参数
+	AllowBlankUsername bool              `json:"allow_blank_username"` // 是否允许空用户名
+	AllowBlankPassword bool              `json:"allow_blank_password"` // 是否允许空密码
+	Type               string            `json:"type"`                 // 服务类型 (ssh, ftp, mysql, etc.)
+	Target             string            `json:"target"`               // 目标地址
+	Username           string            `json:"username"`             // 用户名
+	Password           string            `json:"password"`             // 密码
+	Port               int               `json:"port"`                 // 端口
+	Context            context.Context   `json:"-"`                    // 上下文
+	Timeout            time.Duration     `json:"timeout"`              // 超时时间
+	Extra              map[string]string `json:"extra"`                // 额外参数
 }
 
 // BruteResult 表示爆破结果
@@ -72,10 +74,12 @@ type Config struct {
 	PassDictFile string   `json:"pass_dict_file"` // 密码字典文件
 
 	// 其他设置
-	SkipEmptyPassword bool          `json:"skip_empty_password"` // 跳过空密码
-	SkipEmptyUsername bool          `json:"skip_empty_username"` // 跳过空用户名
-	OnlyNeedPassword  bool          `json:"only_need_password"`  // 只需要密码
-	CustomCallback    BruteCallback `json:"-"`                   // 自定义回调
+	SkipEmptyPassword  bool          `json:"skip_empty_password"`  // 跳过空密码
+	SkipEmptyUsername  bool          `json:"skip_empty_username"`  // 跳过空用户名
+	AllowBlankUsername bool          `json:"allow_blank_username"` // 允许空用户名
+	AllowBlankPassword bool          `json:"allow_blank_password"` // 允许空密码
+	OnlyNeedPassword   bool          `json:"only_need_password"`   // 只需要密码
+	CustomCallback     BruteCallback `json:"-"`                    // 自定义回调
 
 	// 扫描范围
 	PortRange    string `json:"port_range"`    // 端口范围
