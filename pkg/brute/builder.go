@@ -203,7 +203,7 @@ func (b *Builder) generateBruteItems(engine *Engine) error {
 					Username: username,
 					Password: password,
 					Context:  b.ctx,
-					Timeout: b.config.Timeout,
+					Timeout:  b.config.Timeout,
 					Extra:    make(map[string]string),
 				}
 				if err := engine.Feed(item); err != nil {
@@ -234,11 +234,21 @@ func QuickBrute(ctx context.Context, protocol, host string, port int, users, pas
 
 // BatchBrute 批量爆破函数
 func BatchBrute(ctx context.Context, targets []Target, users, passwords []string, callback ResultCallback) error {
+	return BatchBruteWithConfig(ctx, targets, users, passwords, callback, nil)
+}
+
+// BatchBruteWithConfig 带配置的批量爆破函数
+func BatchBruteWithConfig(ctx context.Context, targets []Target, users, passwords []string, callback ResultCallback, config *Config) error {
 	builder := NewBuilder(ctx).
 		WithTargets(targets).
 		WithUserDict(users).
 		WithPassDict(passwords).
 		WithResultCallback(callback)
+
+	// 如果提供了配置，使用配置
+	if config != nil {
+		builder = builder.WithConfig(config)
+	}
 
 	engine, err := builder.Build()
 	if err != nil {

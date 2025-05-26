@@ -144,7 +144,6 @@ func (e *Engine) processTarget(targetKey string) {
 	}
 
 	process := processRaw.(*targetProcess)
-	gologger.Info().Msgf("Processing target: %s", targetKey)
 
 	// 处理所有任务项
 	for _, item := range process.Items {
@@ -159,6 +158,8 @@ func (e *Engine) processTarget(targetKey string) {
 		select {
 		case process.semaphore <- struct{}{}:
 			e.wg.Add(1)
+			gologger.Info().Msgf("Processing target: %s service: %s username:%s password:%s", 
+			targetKey, item.Type, item.Username, item.Password)
 			go e.processItem(item, process)
 		case <-e.ctx.Done():
 			return
@@ -196,6 +197,7 @@ func (e *Engine) processItem(item *BruteItem, process *targetProcess) {
 		process.mutex.Unlock()
 		return
 	}
+	
 }
 
 // executeItem 执行单个爆破项
