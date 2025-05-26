@@ -144,32 +144,47 @@ func (e *Engine) processTarget(targetKey string) {
 	}
 
 	process := processRaw.(*targetProcess)
+	var itemWg sync.WaitGroup
 
 	// 处理所有任务项
 	for _, item := range process.Items {
 		// 检查上下文
 		select {
 		case <-e.ctx.Done():
-			return
+			break
 		default:
 		}
 
-		// 获取信号量
+		// 检查是否需要提前停止
+		process.mutex.RLock()
+		finished := process.Finished
+		process.mutex.RUnlock()
+		if finished {
+			break
+		}
+
+		// 获取信号量，这里会阻塞直到有可用的信号量
 		select {
 		case process.semaphore <- struct{}{}:
+			itemWg.Add(1)
 			e.wg.Add(1)
-			gologger.Info().Msgf("Processing target: %s service: %s username:%s password:%s", 
-			targetKey, item.Type, item.Username, item.Password)
-			go e.processItem(item, process)
+			gologger.Info().Msgf("Processing target: %s service: %s username:%s password:%s",
+				targetKey, item.Type, item.Username, item.Password)
+			go e.processItem(item, process, &itemWg)
 		case <-e.ctx.Done():
-			return
+			break
 		}
 	}
+
+	// 等待当前目标的所有任务完成
+	itemWg.Wait()
+	gologger.Debug().Msgf("Target %s processing completed", targetKey)
 }
 
 // processItem 处理单个爆破项
-func (e *Engine) processItem(item *BruteItem, process *targetProcess) {
+func (e *Engine) processItem(item *BruteItem, process *targetProcess, itemWg *sync.WaitGroup) {
 	defer e.wg.Done()
+	defer itemWg.Done()
 	defer func() { <-process.semaphore }()
 
 	// 限流
@@ -197,7 +212,7 @@ func (e *Engine) processItem(item *BruteItem, process *targetProcess) {
 		process.mutex.Unlock()
 		return
 	}
-	
+
 }
 
 // executeItem 执行单个爆破项
