@@ -57,11 +57,14 @@ func TestQuickBrute(t *testing.T) {
 	}
 
 	err := brute.QuickBrute(ctx, "ssh", "127.0.0.1", 22,
-		[]string{"test"}, []string{"test"}, resultCallback)
+		[]string{"root"}, []string{"123456"}, resultCallback)
 
 	// 这个测试预期会失败，因为通常没有SSH服务在测试环境
 	if err != nil {
 		t.Logf("Expected error for non-existent SSH service: %v", err)
+	}
+	if len(results) > 0 {
+		t.Logf("Received %d results for QuickBrute", len(results))
 	}
 }
 

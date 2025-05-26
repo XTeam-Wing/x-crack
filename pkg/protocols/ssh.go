@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/XTeam-Wing/x-crack/pkg/brute"
+	"github.com/projectdiscovery/gologger"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -25,6 +26,7 @@ func SSHBrute(item *brute.BruteItem) *brute.BruteResult {
 	}
 
 	target := fmt.Sprintf("%s:%d", item.Target, item.Port)
+	gologger.Debug().Msgf("Attempting SSH connection to %s with user %s password %s", target, item.Username, item.Password)
 	client, err := ssh.Dial("tcp", target, config)
 	if err != nil {
 		result.Error = err
