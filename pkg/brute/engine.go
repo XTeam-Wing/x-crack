@@ -44,6 +44,7 @@ func NewEngine(ctx context.Context, config *Config) (*Engine, error) {
 	if config == nil {
 		config = DefaultConfig()
 	}
+	// protocols.RegisterAllProtocols()
 
 	// 验证配置
 	if err := validateConfig(config); err != nil {
@@ -151,7 +152,7 @@ func (e *Engine) processTarget(targetKey string) {
 		// 检查上下文
 		select {
 		case <-e.ctx.Done():
-			break
+			return
 		default:
 		}
 
@@ -172,7 +173,7 @@ func (e *Engine) processTarget(targetKey string) {
 				targetKey, item.Type, item.Username, item.Password)
 			go e.processItem(item, process, &itemWg)
 		case <-e.ctx.Done():
-			break
+			return
 		}
 	}
 
@@ -230,9 +231,11 @@ func (e *Engine) executeItem(item *BruteItem) *BruteResult {
 	// 否则使用内置的协议处理器
 	handler, exists := GetProtocolHandler(item.Type)
 	if !exists {
+		gologger.Error().Msgf("Unsupported protocol: %s", item.Type)
 		result.Error = fmt.Errorf("unsupported protocol: %s", item.Type)
 		return result
 	}
+	gologger.Debug().Msgf("Executing brute force for %s on %s:%d with user %s", item.Type, item.Target, item.Port, item.Username)
 
 	return handler(item)
 }

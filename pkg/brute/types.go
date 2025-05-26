@@ -86,13 +86,13 @@ type Config struct {
 func DefaultConfig() *Config {
 	return &Config{
 		TargetConcurrent:   50,
-		TaskConcurrent:     1,
+		TaskConcurrent:     10,
 		MinDelay:           time.Millisecond * 100,
 		MaxDelay:           time.Millisecond * 500,
 		Timeout:            time.Second * 10,
 		MaxRetries:         3,
 		OkToStop:           false,
-		FinishingThreshold: 0,
+		FinishingThreshold: 10,
 		SkipEmptyPassword:  true,
 		SkipEmptyUsername:  true,
 		OnlyNeedPassword:   false,

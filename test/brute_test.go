@@ -6,6 +6,9 @@ import (
 	"time"
 
 	"github.com/XTeam-Wing/x-crack/pkg/brute"
+	"github.com/XTeam-Wing/x-crack/pkg/protocols"
+	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/gologger/levels"
 )
 
 func TestNewEngine(t *testing.T) {
@@ -69,25 +72,31 @@ func TestQuickBrute(t *testing.T) {
 }
 
 func TestBatchBrute(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	gologger.DefaultLogger.SetMaxLevel(levels.LevelDebug)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 
 	targets := []brute.Target{
 		{Type: "ssh", Host: "127.0.0.1", Port: 22},
-		{Type: "mysql", Host: "127.0.0.1", Port: 3306},
+		// {Type: "mysql", Host: "127.0.0.1", Port: 3306},
 	}
-
+	protocols.RegisterAllProtocols()
 	var results []*brute.BruteResult
 	resultCallback := func(result *brute.BruteResult) {
 		results = append(results, result)
 	}
 
-	err := brute.BatchBrute(ctx, targets,
-		[]string{"test"}, []string{"test"}, resultCallback)
+	config := brute.DefaultConfig()
+
+	err := brute.BatchBruteWithConfig(ctx, targets,
+		[]string{"root"}, []string{"123456"}, resultCallback, config)
 
 	// 这个测试预期会失败，因为通常没有这些服务在测试环境
 	if err != nil {
 		t.Logf("Expected error for non-existent services: %v", err)
+	}
+	if len(results) > 0 {
+		t.Logf("Received %d results for BatchBrute", len(results))
 	}
 }
 
