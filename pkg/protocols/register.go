@@ -7,6 +7,7 @@ import (
 
 // RegisterAllProtocols 注册所有协议处理器
 func RegisterAllProtocols() {
+	brute.RegisterProtocolHandler("socks5", SOCKS5Brute)
 	// 注册HTTP代理爆破处理器
 	brute.RegisterProtocolHandler("http_proxy", HTTPProxyBrute)
 	brute.RegisterProtocolHandler("ssh", SSHBrute)

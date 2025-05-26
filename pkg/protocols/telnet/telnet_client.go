@@ -410,9 +410,10 @@ func (c *Client) loginForUsernameAndPassword() error {
 	time.Sleep(time.Second * 3)
 	c.Clear() //清空一次输出
 	c.WriteContext(c.Password)
-	time.Sleep(time.Second * 5)
+	time.Sleep(time.Second * 3)
 
 	responseString := c.ReadContext()
+	// fmt.Println("responseString:", responseString)
 	if c.isLoginFailed(responseString) {
 		return errors.New("login failed")
 	}
@@ -460,13 +461,15 @@ func (c *Client) isLoginFailed(responseString string) bool {
 func (c *Client) isLoginSucceed(responseString string) bool {
 	responseStringArray := strings.Split(responseString, "\n")
 	lastLine := responseStringArray[len(responseStringArray)-1]
-	if regexp.MustCompile("^[#$].*").MatchString(lastLine) {
+	// fmt.Println("lastLine:", lastLine)
+	// 匹配常见的 shell 提示符，如 root@host:/# 或 username@host:$
+	if regexp.MustCompile(`[#$]\s*$`).MatchString(lastLine) {
 		return true
 	}
 	if regexp.MustCompile("^<[a-zA-Z0-9_]+>.*").MatchString(lastLine) {
 		return true
 	}
-	if regexp.MustCompile("(?:s)last login").MatchString(responseString) {
+	if regexp.MustCompile(`(?i)(last login|welcome|login successful)`).MatchString(responseString) {
 		return true
 	}
 	c.Clear()
