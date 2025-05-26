@@ -235,8 +235,6 @@ func (e *Engine) executeItem(item *BruteItem) *BruteResult {
 		result.Error = fmt.Errorf("unsupported protocol: %s", item.Type)
 		return result
 	}
-	gologger.Debug().Msgf("Executing brute force for %s on %s:%d with user %s", item.Type, item.Target, item.Port, item.Username)
-
 	return handler(item)
 }
 

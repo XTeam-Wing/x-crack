@@ -1,12 +1,17 @@
 package protocols
 
-import "github.com/XTeam-Wing/x-crack/pkg/brute"
+import (
+	"github.com/XTeam-Wing/x-crack/pkg/brute"
+	"github.com/XTeam-Wing/x-crack/pkg/protocols/telnet"
+)
 
 // RegisterAllProtocols 注册所有协议处理器
 func RegisterAllProtocols() {
+	// 注册HTTP代理爆破处理器
+	brute.RegisterProtocolHandler("http_proxy", HTTPProxyBrute)
 	brute.RegisterProtocolHandler("ssh", SSHBrute)
 	brute.RegisterProtocolHandler("ftp", FTPBrute)
-	brute.RegisterProtocolHandler("telnet", TelnetBrute)
+	brute.RegisterProtocolHandler("telnet", telnet.TelnetBrute)
 	brute.RegisterProtocolHandler("mysql", MySQLBrute)
 	brute.RegisterProtocolHandler("postgresql", PostgreSQLBrute)
 	brute.RegisterProtocolHandler("redis", RedisBrute)

@@ -1,9 +1,10 @@
 package protocols
 
 import (
-	"fmt"
+	"context"
 
 	"github.com/XTeam-Wing/x-crack/pkg/brute"
+	"github.com/yaklang/yaklang/common/utils/bruteutils"
 )
 
 // RDPBrute RDP爆破
@@ -13,9 +14,16 @@ func RDPBrute(item *brute.BruteItem) *brute.BruteResult {
 		Success: false,
 	}
 
-	// TODO: 实现RDP爆破逻辑
-	// 可以使用github.com/icodeface/grdp或其他RDP库
-	// 目前先返回未实现错误
-	result.Error = fmt.Errorf("RDP brute force not implemented yet")
+	_, cancel := context.WithTimeout(context.Background(), item.Timeout)
+	defer cancel()
+
+	ok, err := bruteutils.RDPLogin(item.Target, item.Target,
+		item.Username, item.Password, item.Port)
+	if err != nil {
+		result.Error = err
+		return result
+	}
+
+	result.Success = ok
 	return result
 }
