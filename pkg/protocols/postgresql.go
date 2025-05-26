@@ -1,12 +1,10 @@
 package protocols
 
 import (
-	"context"
-	"database/sql"
-	"fmt"
+	"strings"
 
 	"github.com/XTeam-Wing/x-crack/pkg/brute"
-	_ "github.com/lib/pq"
+	"github.com/go-pg/pg/v10"
 )
 
 // PostgreSQLBrute PostgreSQL爆破
@@ -16,26 +14,27 @@ func PostgreSQLBrute(item *brute.BruteItem) *brute.BruteResult {
 		Success: false,
 	}
 
-	timeout := item.Timeout
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=postgres sslmode=disable connect_timeout=%d",
-		item.Target, item.Port, item.Username, item.Password, int(timeout.Seconds()))
-
-	db, err := sql.Open("postgres", psqlInfo)
+	db := pg.Connect(&pg.Options{
+		Addr:     item.Target,
+		User:     item.Username,
+		Password: item.Password,
+		Database: "postgres",
+	})
+	_, err := db.Exec("select 1")
 	if err != nil {
-		result.Error = err
+		switch true {
+		case strings.Contains(err.Error(), "connect: connection refused"):
+			fallthrough
+		case strings.Contains(err.Error(), "no pg_hba.conf entry for host"):
+			fallthrough
+		case strings.Contains(err.Error(), "network unreachable"):
+			fallthrough
+		case strings.Contains(err.Error(), "i/o timeout"):
+			result.Finished = true
+			return result
+		}
 		return result
 	}
-	defer db.Close()
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
-	if err := db.PingContext(ctx); err != nil {
-		result.Error = err
-		return result
-	}
-
 	result.Success = true
-	result.Banner = "PostgreSQL connection successful"
 	return result
 }

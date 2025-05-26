@@ -206,6 +206,7 @@ func (b *Builder) generateBruteItems(engine *Engine) error {
 					Timeout:  b.config.Timeout,
 					Extra:    make(map[string]string),
 				}
+				
 				if err := engine.Feed(item); err != nil {
 					return fmt.Errorf("failed to feed brute item: %w", err)
 				}

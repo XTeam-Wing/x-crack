@@ -3,12 +3,15 @@ module github.com/XTeam-Wing/x-crack
 go 1.24.2
 
 require (
+	github.com/go-pg/pg/v10 v10.14.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.9.2
 	github.com/gosnmp/gosnmp v1.40.0
 	github.com/hirochachacha/go-smb2 v1.1.0
+	github.com/huin/asn1ber v0.0.0-20120622192748-af09f62e6358
+	github.com/icodeface/tls v0.0.0-20230910023335-34df9250cd12
 	github.com/jlaffaye/ftp v0.2.0
-	github.com/lib/pq v1.10.9
+	github.com/lunixbochs/struc v0.0.0-20200707160740-784aaebc1d40
 	github.com/mitchellh/go-vnc v0.0.0-20150629162542-723ed9867aed
 	github.com/projectdiscovery/goflags v0.1.74
 	github.com/projectdiscovery/gologger v1.1.46
@@ -16,6 +19,7 @@ require (
 	github.com/yaklang/yaklang v1.4.1-beta7
 	go.mongodb.org/mongo-driver v1.17.3
 	golang.org/x/crypto v0.33.0
+	golang.org/x/net v0.35.0
 	golang.org/x/time v0.5.0
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -48,7 +52,6 @@ require (
 	github.com/emersion/go-textwrapper v0.0.0-20200911093747-65d896831594 // indirect
 	github.com/geoffgarside/ber v1.1.0 // indirect
 	github.com/go-ldap/ldap v3.0.3+incompatible // indirect
-	github.com/go-pg/pg/v10 v10.14.0 // indirect
 	github.com/go-pg/zerochecker v0.2.0 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
@@ -67,7 +70,6 @@ require (
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hpcloud/tail v1.0.0 // indirect
-	github.com/huin/asn1ber v0.0.0-20120622192748-af09f62e6358 // indirect
 	github.com/icza/bitio v1.1.0 // indirect
 	github.com/jellydator/ttlcache/v3 v3.3.0 // indirect
 	github.com/jinzhu/gorm v1.9.2 // indirect
@@ -80,8 +82,8 @@ require (
 	github.com/kr/fs v0.1.0 // indirect
 	github.com/lestrrat/go-file-rotatelogs v0.0.0-20180223000712-d3151e2a480f // indirect
 	github.com/lestrrat/go-strftime v0.0.0-20180220042222-ba3bf9c1d042 // indirect
+	github.com/lib/pq v1.10.9 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
-	github.com/lunixbochs/struc v0.0.0-20200707160740-784aaebc1d40 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect
@@ -134,7 +136,6 @@ require (
 	go.uber.org/mock v0.4.0 // indirect
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/mod v0.19.0 // indirect
-	golang.org/x/net v0.35.0 // indirect
 	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
