@@ -16,18 +16,28 @@ import (
 	"golang.org/x/time/rate"
 )
 
-// Engine 爆破引擎
+// Engine 暴力破解引擎
 type Engine struct {
 	config         *Config
 	targets        *list.List
 	processes      sync.Map
-	resultCallback ResultCallback
 	limiter        *rate.Limiter
+	globalSem      chan struct{} // 全局并发控制信号量
 	ctx            context.Context
 	cancel         context.CancelFunc
 	wg             sync.WaitGroup
 	targetWg       sync.WaitGroup
-	globalSem      chan struct{} // 全局并发控制信号量
+	resultCallback ResultCallback // 结果回调函数
+
+	// 进度跟踪相关字段
+	totalItems     int64         // 总任务数
+	processedItems int64         // 已处理任务数
+	successItems   int64         // 成功任务数
+	failedItems    int64         // 失败任务数
+	startTime      time.Time     // 开始时间
+	progressTicker *time.Ticker  // 进度打印定时器
+	progressDone   chan struct{} // 进度打印停止信号
+	progressMutex  sync.RWMutex  // 进度相关的读写锁
 }
 
 // targetProcess 目标处理状态
@@ -108,6 +118,9 @@ func (e *Engine) Feed(item *BruteItem) error {
 	process.Items = append(process.Items, item)
 	process.mutex.Unlock()
 
+	// 更新总任务数
+	atomic.AddInt64(&e.totalItems, 1)
+
 	return nil
 }
 
@@ -123,7 +136,16 @@ func (e *Engine) Start() error {
 		return nil
 	}
 
-	gologger.Info().Msgf("Processing %d targets", targetCount)
+	totalTasks := atomic.LoadInt64(&e.totalItems)
+	gologger.Info().Msgf("Processing %d targets with %d total tasks", targetCount, totalTasks)
+
+	// 记录开始时间
+	e.startTime = time.Now()
+
+	// 启动进度打印协程（如果启用）
+	if e.config.ShowProgress {
+		e.startProgressTicker()
+	}
 
 	// 遍历所有目标
 	for element := e.targets.Front(); element != nil; element = element.Next() {
@@ -132,17 +154,17 @@ func (e *Engine) Start() error {
 		e.targetWg.Add(1)
 		go e.processTarget(targetKey)
 	}
-	if e.config.ShowProgress {
-		globalUsed, globalTotal, targetUsed, targetTotal := e.GetConcurrencyStatus()
-		processedCount := e.GetProcessedCount()
-		gologger.Info().Msgf("processed %d items, global concurrency %d/%d, target concurrency %d/%d",
-			processedCount, globalUsed, globalTotal, targetUsed, targetTotal)
-	}
+
 	// 等待所有目标处理完成
 	e.targetWg.Wait()
 
-	processedCount := e.GetProcessedCount()
-	gologger.Info().Msgf("Brute force engine completed, processed %d items", processedCount)
+	// 停止进度打印
+	if e.config.ShowProgress {
+		e.stopProgressTicker()
+	}
+
+	// 打印最终统计信息
+	e.printFinalStats()
 
 	return nil
 }
@@ -231,6 +253,14 @@ func (e *Engine) processItem(item *BruteItem, process *targetProcess, itemWg *sy
 
 	// 更新计数
 	atomic.AddInt32(&process.Count, 1)
+
+	// 更新全局进度
+	atomic.AddInt64(&e.processedItems, 1)
+	if result.Success {
+		atomic.AddInt64(&e.successItems, 1)
+	} else {
+		atomic.AddInt64(&e.failedItems, 1)
+	}
 
 	// 调用结果回调
 	if e.resultCallback != nil {
@@ -394,4 +424,148 @@ func (e *Engine) GetConcurrencyStatus() (globalUsed, globalTotal, targetUsed, ta
 	})
 
 	return globalUsed, globalTotal, totalTargetUsed, totalTargetCap
+}
+
+// startProgressTicker 启动进度打印定时器
+func (e *Engine) startProgressTicker() {
+	e.progressDone = make(chan struct{})
+
+	// 根据任务总数动态调整打印间隔
+	total := atomic.LoadInt64(&e.totalItems)
+	var interval time.Duration
+	switch {
+	case total < 100:
+		interval = 2 * time.Second // 少量任务，2秒间隔
+	case total < 1000:
+		interval = 1 * time.Second // 中等任务，1秒间隔
+	default:
+		interval = 500 * time.Millisecond // 大量任务，500ms间隔
+	}
+
+	e.progressTicker = time.NewTicker(interval)
+
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				gologger.Error().Msgf("Progress ticker panic: %v", r)
+			}
+		}()
+
+		for {
+			select {
+			case <-e.progressTicker.C:
+				// 检查是否还有活跃的任务
+				if e.isActive() {
+					e.printProgress()
+				}
+			case <-e.progressDone:
+				return
+			case <-e.ctx.Done():
+				return
+			}
+		}
+	}()
+}
+
+// isActive 检查引擎是否还在活跃处理任务
+func (e *Engine) isActive() bool {
+	total := atomic.LoadInt64(&e.totalItems)
+	processed := atomic.LoadInt64(&e.processedItems)
+	return processed < total
+}
+
+// stopProgressTicker 停止进度打印定时器
+func (e *Engine) stopProgressTicker() {
+	if e.progressTicker != nil {
+		e.progressTicker.Stop()
+	}
+	close(e.progressDone)
+}
+
+// printProgress 打印当前进度
+func (e *Engine) printProgress() {
+	e.progressMutex.RLock()
+	defer e.progressMutex.RUnlock()
+
+	total := atomic.LoadInt64(&e.totalItems)
+	processed := atomic.LoadInt64(&e.processedItems)
+	success := atomic.LoadInt64(&e.successItems)
+	failed := atomic.LoadInt64(&e.failedItems)
+
+	if total == 0 {
+		return // 避免除零错误
+	}
+
+	elapsed := time.Since(e.startTime)
+	rate := float64(processed) / elapsed.Seconds()
+
+	// 计算进度百分比
+	percentage := float64(processed) / float64(total) * 100
+
+	// 估算剩余时间
+	var eta string
+	if rate > 0 && processed < total {
+		remaining := total - processed
+		etaSeconds := float64(remaining) / rate
+		eta = time.Duration(etaSeconds * float64(time.Second)).Truncate(time.Second).String()
+	} else {
+		eta = "N/A"
+	}
+
+	// 获取并发状态
+	globalUsed, globalTotal, targetUsed, targetTotal := e.GetConcurrencyStatus()
+
+	gologger.Info().Msgf("Progress: %d/%d (%.1f%%) | Success: %d | Failed: %d | Rate: %.2f/s | ETA: %s | Concurrency: G=%d/%d T=%d/%d",
+		processed, total, percentage, success, failed, rate, eta, globalUsed, globalTotal, targetUsed, targetTotal)
+}
+
+// printFinalStats 打印最终统计信息
+func (e *Engine) printFinalStats() {
+	total := atomic.LoadInt64(&e.totalItems)
+	processed := atomic.LoadInt64(&e.processedItems)
+	success := atomic.LoadInt64(&e.successItems)
+	failed := atomic.LoadInt64(&e.failedItems)
+
+	elapsed := time.Since(e.startTime)
+	avgRate := float64(processed) / elapsed.Seconds()
+
+	gologger.Info().Msgf("=== Brute Force Completed ===")
+	gologger.Info().Msgf("Total Tasks: %d | Processed: %d | Success: %d | Failed: %d",
+		total, processed, success, failed)
+	gologger.Info().Msgf("Time Elapsed: %v | Average Rate: %.2f items/sec",
+		elapsed.Truncate(time.Millisecond), avgRate)
+
+	if success > 0 {
+		successRate := float64(success) / float64(processed) * 100
+		gologger.Info().Msgf("Success Rate: %.2f%%", successRate)
+	}
+}
+
+// GetProgressStats 获取详细的进度统计信息
+func (e *Engine) GetProgressStats() (total, processed, success, failed int64, rate float64, elapsed time.Duration) {
+	total = atomic.LoadInt64(&e.totalItems)
+	processed = atomic.LoadInt64(&e.processedItems)
+	success = atomic.LoadInt64(&e.successItems)
+	failed = atomic.LoadInt64(&e.failedItems)
+	elapsed = time.Since(e.startTime)
+
+	if elapsed.Seconds() > 0 {
+		rate = float64(processed) / elapsed.Seconds()
+	}
+
+	return
+}
+
+// SetProgressInterval 设置进度打印间隔
+func (e *Engine) SetProgressInterval(interval time.Duration) {
+	if interval <= 0 {
+		interval = time.Second
+	}
+
+	// 如果进度打印器正在运行，重新启动
+	if e.progressTicker != nil {
+		e.stopProgressTicker()
+		e.progressTicker = time.NewTicker(interval)
+		e.startProgressTicker()
+	}
 }
