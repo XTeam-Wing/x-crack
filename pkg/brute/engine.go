@@ -132,9 +132,15 @@ func (e *Engine) Start() error {
 		e.targetWg.Add(1)
 		go e.processTarget(targetKey)
 	}
-
+	if e.config.ShowProgress {
+		globalUsed, globalTotal, targetUsed, targetTotal := e.GetConcurrencyStatus()
+		processedCount := e.GetProcessedCount()
+		gologger.Info().Msgf("processed %d items, global concurrency %d/%d, target concurrency %d/%d",
+			processedCount, globalUsed, globalTotal, targetUsed, targetTotal)
+	}
 	// 等待所有目标处理完成
 	e.targetWg.Wait()
+
 	processedCount := e.GetProcessedCount()
 	gologger.Info().Msgf("Brute force engine completed, processed %d items", processedCount)
 

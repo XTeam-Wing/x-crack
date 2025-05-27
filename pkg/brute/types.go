@@ -80,6 +80,8 @@ type Config struct {
 	AllowBlankPassword bool          `json:"allow_blank_password"` // 允许空密码
 	OnlyNeedPassword   bool          `json:"only_need_password"`   // 只需要密码
 	CustomCallback     BruteCallback `json:"-"`                    // 自定义回调
+	// 显示进度
+	ShowProgress bool `json:"show_progress"` // 是否显示进度
 
 	// 扫描范围
 	PortRange    string `json:"port_range"`    // 端口范围
