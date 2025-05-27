@@ -157,7 +157,6 @@ func (e *Engine) Start() error {
 
 	// 等待所有目标处理完成
 	e.targetWg.Wait()
-
 	// 停止进度打印
 	if e.config.ShowProgress {
 		e.stopProgressTicker()
