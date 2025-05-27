@@ -150,7 +150,6 @@ func (e *Engine) Start() error {
 	// 遍历所有目标
 	for element := e.targets.Front(); element != nil; element = element.Next() {
 		targetKey := element.Value.(string)
-
 		e.targetWg.Add(1)
 		go e.processTarget(targetKey)
 	}
