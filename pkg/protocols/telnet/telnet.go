@@ -16,7 +16,6 @@ func TelnetBrute(item *brute.BruteItem) *brute.BruteResult {
 	client := New(item.Target, item.Port, item.Timeout)
 	err := client.Connect()
 	if err != nil {
-		gologger.Error().Msg("Failed to connect to Telnet server: " + err.Error())
 		result.Error = err
 		return result
 	}
@@ -28,8 +27,6 @@ func TelnetBrute(item *brute.BruteItem) *brute.BruteResult {
 		item.Port, item.Username, item.Password, client.ServerType)
 	err = client.Login()
 	if err != nil {
-		gologger.Error().Msg("Failed to loggin to Telnet server: " + err.Error())
-
 		result.Error = err
 		return result
 	}
