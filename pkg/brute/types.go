@@ -89,16 +89,16 @@ type Config struct {
 // DefaultConfig 返回默认配置
 func DefaultConfig() *Config {
 	return &Config{
-		TargetConcurrent:   50,
-		TaskConcurrent:     10,
-		MinDelay:           time.Millisecond * 100,
-		MaxDelay:           time.Millisecond * 500,
-		Timeout:            time.Second * 10,
-		MaxRetries:         3,
-		OkToStop:           false,
-		FinishingThreshold: 10,
-		SkipEmptyPassword:  true,
-		SkipEmptyUsername:  true,
+		TargetConcurrent:   10,                      // 降低默认并发数，避免过度并发
+		TaskConcurrent:     5,                       // 单个目标的任务并发数
+		MinDelay:           time.Millisecond * 200,  // 增加默认延迟，避免过快请求
+		MaxDelay:           time.Millisecond * 1000, // 最大延迟
+		Timeout:            time.Second * 10,        // 连接超时
+		MaxRetries:         3,                       // 最大重试次数
+		OkToStop:           false,                   // 成功后不自动停止
+		FinishingThreshold: 10,                      // 完成阈值
+		SkipEmptyPassword:  true,                    // 跳过空密码
+		SkipEmptyUsername:  true,                    // 跳过空用户名
 		OnlyNeedPassword:   false,
 		PortRange:          "",
 		ExcludePorts:       []int{},
