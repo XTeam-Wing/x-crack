@@ -15,7 +15,8 @@ require (
 	github.com/mitchellh/go-vnc v0.0.0-20150629162542-723ed9867aed
 	github.com/projectdiscovery/goflags v0.1.74
 	github.com/projectdiscovery/gologger v1.1.46
-	github.com/samber/lo v1.47.0
+	github.com/projectdiscovery/utils v0.4.19
+	github.com/samber/lo v1.38.1
 	github.com/yaklang/yaklang v1.4.1-beta7
 	go.mongodb.org/mongo-driver v1.17.3
 	golang.org/x/crypto v0.33.0
@@ -104,7 +105,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pkg/sftp v1.11.0 // indirect
 	github.com/projectdiscovery/blackrock v0.0.1 // indirect
-	github.com/projectdiscovery/utils v0.4.19 // indirect
 	github.com/quic-go/qpack v0.5.1 // indirect
 	github.com/quic-go/quic-go v0.48.1 // indirect
 	github.com/refraction-networking/utls v1.6.7 // indirect
