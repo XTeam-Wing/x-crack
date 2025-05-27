@@ -232,3 +232,5 @@ func DeduplicateStrings(slice []string) []string {
 
 	return result
 }
+
+// 解析任意类型IP
