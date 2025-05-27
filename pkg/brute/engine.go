@@ -150,14 +150,12 @@ func (e *Engine) Start() error {
 	// 遍历所有目标
 	for element := e.targets.Front(); element != nil; element = element.Next() {
 		targetKey := element.Value.(string)
-
 		e.targetWg.Add(1)
 		go e.processTarget(targetKey)
 	}
 
 	// 等待所有目标处理完成
 	e.targetWg.Wait()
-
 	// 停止进度打印
 	if e.config.ShowProgress {
 		e.stopProgressTicker()
