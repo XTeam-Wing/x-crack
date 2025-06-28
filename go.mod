@@ -16,7 +16,7 @@ require (
 	github.com/projectdiscovery/goflags v0.1.74
 	github.com/projectdiscovery/gologger v1.1.46
 	github.com/samber/lo v1.47.0
-	github.com/yaklang/yaklang v1.4.1-beta7
+	github.com/yaklang/yaklang v1.4.2-beta7
 	go.mongodb.org/mongo-driver v1.17.3
 	golang.org/x/crypto v0.33.0
 	golang.org/x/net v0.35.0
@@ -29,7 +29,7 @@ require (
 	github.com/DataDog/mmh3 v0.0.0-20210722141835-012dc69a9e49 // indirect
 	github.com/andybalholm/brotli v1.0.6 // indirect
 	github.com/antchfx/xmlquery v1.3.1 // indirect
-	github.com/antchfx/xpath v1.2.1 // indirect
+	github.com/antchfx/xpath v1.3.2 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.0.0-20220911224424-aa1f1f12a846 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
