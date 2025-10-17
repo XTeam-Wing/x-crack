@@ -16,6 +16,7 @@ require (
 	github.com/projectdiscovery/goflags v0.1.74
 	github.com/projectdiscovery/gologger v1.1.46
 	github.com/projectdiscovery/utils v0.4.12
+	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/samber/lo v1.47.0
 	github.com/yaklang/yaklang v1.4.2-beta7
 	go.mongodb.org/mongo-driver v1.17.3
@@ -104,8 +105,7 @@ require (
 	github.com/pkg/sftp v1.11.0 // indirect
 	github.com/projectdiscovery/blackrock v0.0.1 // indirect
 	github.com/quic-go/qpack v0.5.1 // indirect
-	github.com/quic-go/quic-go v0.48.1 // indirect
-	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
+	github.com/quic-go/quic-go v0.49.1 // indirect
 	github.com/refraction-networking/utls v1.6.7 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect
@@ -132,7 +132,7 @@ require (
 	github.com/yaklang/pcap v1.0.5 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
-	go.uber.org/mock v0.4.0 // indirect
+	go.uber.org/mock v0.5.0 // indirect
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/mod v0.19.0 // indirect
 	golang.org/x/sync v0.11.0 // indirect
