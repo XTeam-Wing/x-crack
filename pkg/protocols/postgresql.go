@@ -13,6 +13,9 @@ func PostgreSQLBrute(item *brute.BruteItem) *brute.BruteResult {
 		Item:    item,
 		Success: false,
 	}
+	if item.Username == "" {
+		return result
+	}
 
 	db := pg.Connect(&pg.Options{
 		Addr:     item.Target,

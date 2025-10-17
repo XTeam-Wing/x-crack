@@ -14,7 +14,9 @@ func SOCKS5Brute(item *brute.BruteItem) *brute.BruteResult {
 		Item:    item,
 		Success: false,
 	}
-
+	if item.Username == "" {
+		return result
+	}
 	// 构建SOCKS5服务器地址
 	socks5Addr := fmt.Sprintf("%s:%d", item.Target, item.Port)
 
@@ -36,7 +38,7 @@ func SOCKS5Brute(item *brute.BruteItem) *brute.BruteResult {
 		}
 
 		// 尝试通过代理连接到一个目标地址来验证认证
-		testAddr := "223.5.5.5:53" // 使用Google DNS作为测试目标
+		testAddr := "223.5.5.5:53" // ali DNS作为测试目标
 		conn, err := dialer.Dial("tcp", testAddr)
 		if err != nil {
 			// 认证失败或连接失败

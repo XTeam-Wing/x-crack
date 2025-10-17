@@ -14,9 +14,15 @@ func HTTPSProxyBrute(item *brute.BruteItem) *brute.BruteResult {
 		Item:    item,
 		Success: false,
 	}
-
+	var httpProxyAddress string
+	if item.Username == "" && item.Password == "" {
+		httpProxyAddress = fmt.Sprintf("https://%s:%d", item.Target, item.Port)
+	} else if item.Password != "" && item.Username != "" {
+		httpProxyAddress = fmt.Sprintf("https://%s:%s@%s:%d", item.Username, item.Password, item.Target, item.Port)
+	} else {
+		return result
+	}
 	// 实现HTTP代理的验证逻辑
-	httpProxyAddress := fmt.Sprintf("https://%s:%d", item.Target, item.Port)
 	proxyURL, err := url.Parse(httpProxyAddress)
 	if err != nil {
 		result.Error = err

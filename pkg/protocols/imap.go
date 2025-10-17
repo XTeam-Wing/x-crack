@@ -13,6 +13,9 @@ func IMAPBrute(item *brute.BruteItem) *brute.BruteResult {
 		Item:    item,
 		Success: false,
 	}
+	if item.Username == "" {
+		return result
+	}
 
 	ok, err := bruteutils.IMAPAuth(fmt.Sprintf("%s:%d", item.Target, item.Port), item.Username, item.Password)
 	if err != nil {

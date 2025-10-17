@@ -14,6 +14,10 @@ func POP3Brute(item *brute.BruteItem) *brute.BruteResult {
 		Item:    item,
 		Success: false,
 	}
+	if item.Username == "" {
+		return result
+	}
+
 	timeout := item.Timeout
 	_, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()

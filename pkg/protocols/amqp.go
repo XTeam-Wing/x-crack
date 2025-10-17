@@ -13,11 +13,13 @@ func AMQPBrute(item *brute.BruteItem) *brute.BruteResult {
 		Success: false,
 	}
 	// 创建带超时的 context
-	target := fmt.Sprintf("%s:%d", item.Target, item.Port)
-	if item.Username != "" && item.Password != "" {
+	var target string
+	if item.Username == "" && item.Password == "" {
+		target = fmt.Sprintf("amqp://%s:%d", item.Target, item.Port)
+	} else if item.Password != "" && item.Username != "" {
 		target = fmt.Sprintf("amqp://%s:%s@%s:%d", item.Username, item.Password, item.Target, item.Port)
 	} else {
-		target = fmt.Sprintf("amqp://%s:%d", item.Target, item.Port)
+		return result
 	}
 	conn, err := amqp.Dial(target)
 	if err != nil {

@@ -16,6 +16,9 @@ func SSHBrute(item *brute.BruteItem) *brute.BruteResult {
 		Item:    item,
 		Success: false,
 	}
+	if item.Username == "" {
+		return result
+	}
 
 	// 创建带超时的 context
 	ctx, cancel := context.WithTimeout(context.Background(), item.Timeout)
