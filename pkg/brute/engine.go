@@ -55,8 +55,6 @@ func NewEngine(ctx context.Context, config *Config) (*Engine, error) {
 	if config == nil {
 		config = DefaultConfig()
 	}
-	// protocols.RegisterAllProtocols()
-
 	// 验证配置
 	if err := validateConfig(config); err != nil {
 		return nil, fmt.Errorf("invalid config: %w", err)
