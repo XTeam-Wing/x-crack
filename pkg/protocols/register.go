@@ -26,4 +26,6 @@ func RegisterAllProtocols() {
 	brute.RegisterProtocolHandler("imap", IMAPBrute)
 	brute.RegisterProtocolHandler("pop3", POP3Brute)
 	brute.RegisterProtocolHandler("smtp", SMTPBrute)
+	brute.RegisterProtocolHandler("amqp", AMQPBrute)
+
 }
