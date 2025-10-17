@@ -14,6 +14,9 @@ func SMBBrute(item *brute.BruteItem) *brute.BruteResult {
 		Item:    item,
 		Success: false,
 	}
+	if item.Username == "" {
+		return result
+	}
 
 	timeout := item.Timeout
 	address := fmt.Sprintf("%s:%d", item.Target, item.Port)

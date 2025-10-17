@@ -22,7 +22,15 @@ func MongoDBBrute(item *brute.BruteItem) *brute.BruteResult {
 	defer cancel()
 
 	// MongoDB连接URI
-	dataSourceName := fmt.Sprintf("mongodb://%s:%s@%v:%v/?authMechanism=SCRAM-SHA-1", item.Username, item.Password, item.Target, item.Port)
+	var dataSourceName string
+	if item.Username == "" && item.Password == "" {
+		dataSourceName = fmt.Sprintf("mongodb://%v:%v", item.Target, item.Port)
+	} else if item.Password != "" && item.Username != "" {
+		dataSourceName = fmt.Sprintf("mongodb://%s:%s@%v:%v/?authMechanism=SCRAM-SHA-1", item.Username, item.Password, item.Target, item.Port)
+	} else {
+		return result
+	}
+
 	clientOptions := options.Client().ApplyURI(dataSourceName)
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {

@@ -14,6 +14,10 @@ func RedisBrute(item *brute.BruteItem) *brute.BruteResult {
 		Item:    item,
 		Success: false,
 	}
+	if item.Username != "" {
+		// Redis一般不使用用户名认证
+		return result
+	}
 
 	timeout := item.Timeout
 

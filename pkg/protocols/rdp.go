@@ -14,6 +14,10 @@ func RDPBrute(item *brute.BruteItem) *brute.BruteResult {
 		Item:    item,
 		Success: false,
 	}
+	if item.Username == "" {
+		return result
+	}
+
 	target := fmt.Sprintf("%s:%d", item.Target, item.Port)
 
 	ctx, cancel := context.WithTimeout(context.Background(), item.Timeout)

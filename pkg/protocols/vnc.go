@@ -15,7 +15,10 @@ func VNCBrute(item *brute.BruteItem) *brute.BruteResult {
 		Item:    item,
 		Success: false,
 	}
-
+	if item.Username != "" {
+		// VNC一般不使用用户名认证
+		return result
+	}
 	// 创建带超时的上下文
 	ctx, cancel := context.WithTimeout(context.Background(), item.Timeout)
 	defer cancel()

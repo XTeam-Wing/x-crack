@@ -13,7 +13,9 @@ func HTTPBrute(item *brute.BruteItem) *brute.BruteResult {
 		Item:    item,
 		Success: false,
 	}
-
+	if item.Username == "" || item.Password == "" {
+		return result
+	}
 	timeout := item.Timeout
 	client := &http.Client{
 		Timeout: timeout,
