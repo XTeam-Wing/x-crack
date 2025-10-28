@@ -162,13 +162,6 @@ func executeBrute(ctx context.Context, cli *CLI) error {
 	}
 	// 创建爆破配置
 	bruteConfig := createBruteConfig(cli)
-
-	if cli.AllowBlankPassword {
-		bruteConfig.AllowBlankUsername = true
-	}
-	if cli.AllowBlankUsername {
-		bruteConfig.AllowBlankUsername = true
-	}
 	// 创建结果回调
 	resultCallback := createResultCallback(cli)
 
@@ -214,13 +207,6 @@ func executeBruteWithServiceTargets(ctx context.Context, cli *CLI) error {
 
 	// 创建爆破配置
 	bruteConfig := createBruteConfig(cli)
-
-	if cli.AllowBlankPassword {
-		bruteConfig.AllowBlankPassword = true
-	}
-	if cli.AllowBlankUsername {
-		bruteConfig.AllowBlankUsername = true
-	}
 
 	// 创建结果回调
 	resultCallback := createResultCallback(cli)
@@ -358,9 +344,9 @@ func parseCredentials(cli *CLI) ([]string, []string, error) {
 	var usernames, passwords []string
 
 	// 解析用户名
-	if cli.Username != "" {
-		usernames = append(usernames, cli.Username)
-	}
+
+	usernames = append(usernames, cli.Username)
+
 	usernames = append(usernames, []string(cli.Usernames)...)
 
 	if cli.UserFile != "" {
@@ -400,13 +386,9 @@ func parseCredentials(cli *CLI) ([]string, []string, error) {
 			}
 		}
 	}
-	// 添加空凭据支持
-	if cli.AllowBlankUsername {
-		usernames = append(usernames, "")
-	}
-	if cli.AllowBlankPassword {
-		passwords = append(passwords, "")
-	}
+	usernames = append(usernames, "")
+	passwords = append(passwords, "")
+
 	return lo.Uniq(usernames), lo.Uniq(passwords), nil
 }
 
@@ -452,15 +434,9 @@ func createBruteConfig(cli *CLI) *brute.Config {
 	// 设置停止条件
 	config.OkToStop = cli.OkToStop
 
-	// 设置跳过空值选项
-	// 如果用户明确允许空凭据，则不跳过它们
-	if cli.AllowBlankUsername {
-		config.SkipEmptyUsername = false
-	}
+	config.AllowBlankPassword = true
+	config.SkipEmptyPassword = false
 
-	if cli.AllowBlankPassword {
-		config.SkipEmptyPassword = false
-	}
 	return config
 }
 
@@ -518,6 +494,7 @@ func createResultCallback(cli *CLI) brute.ResultCallback {
 
 // parseFlags 解析命令行参数（简化实现，实际应该使用flag或其他库）
 func parseFlags() (*CLI, error) {
+
 	cli := &CLI{
 		TargetConcurrent: 0,  // 使用0作为默认值，表示未设置
 		TaskConcurrent:   0,  // 使用0作为默认值，表示未设置
@@ -547,8 +524,6 @@ func parseFlags() (*CLI, error) {
 		flagSet.StringSliceVar(&cli.Passwords, "passwords", []string{}, "Passwords (comma separated)", goflags.NormalizedStringSliceOptions),
 		flagSet.StringVarP(&cli.PassFile, "pass-file", "pf", "", "File containing passwords"),
 		flagSet.StringVar(&cli.UserPassFile, "userpass-file", "", "File containing username:password combinations"),
-		flagSet.BoolVar(&cli.AllowBlankUsername, "allow-blank-username", false, "Allow blank/empty usernames during brute force"),
-		flagSet.BoolVar(&cli.AllowBlankPassword, "allow-blank-password", false, "Allow blank/empty passwords during brute force"),
 	)
 
 	flagSet.CreateGroup("brute", "Brute force settings",

@@ -15,19 +15,22 @@ func MySQLBrute(item *brute.BruteItem) *brute.BruteResult {
 		Item:    item,
 		Success: false,
 	}
-	if item.Username == "" {
-		return result
-	}
 
 	// 创建带超时的上下文
 	ctx, cancel := context.WithTimeout(context.Background(), item.Timeout)
 	defer cancel()
-
-	// 构建DSN连接字符串，添加更多参数
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/?timeout=%s&readTimeout=%s&writeTimeout=%s",
-		item.Username, item.Password, item.Target, item.Port,
-		item.Timeout.String(), item.Timeout.String(), item.Timeout.String())
-
+	var dsn string
+	if item.Username == "" && item.Password == "" {
+		// 无用户名密码时使用匿名登录
+		dsn = fmt.Sprintf("tcp(%s:%d)/?timeout=%s&readTimeout=%s&writeTimeout=%s",
+			item.Target, item.Port,
+			item.Timeout.String(), item.Timeout.String(), item.Timeout.String())
+	} else {
+		// 有用户名密码时使用标准登录
+		dsn = fmt.Sprintf("%s:%s@tcp(%s:%d)/?timeout=%s&readTimeout=%s&writeTimeout=%s",
+			item.Username, item.Password, item.Target, item.Port,
+			item.Timeout.String(), item.Timeout.String(), item.Timeout.String())
+	}
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		result.Error = fmt.Errorf("failed to create MySQL connection: %w", err)

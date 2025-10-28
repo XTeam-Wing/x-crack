@@ -185,20 +185,8 @@ func (b *Builder) Build() (*Engine, error) {
 func (b *Builder) generateBruteItems(engine *Engine) error {
 	for _, target := range b.targets {
 		for _, username := range b.config.UserDict {
-			// 跳过空用户名
-			if b.config.SkipEmptyUsername && username == "" {
-				continue
-			}
-
 			for _, password := range b.config.PassDict {
-				// 跳过空密码
-				if b.config.SkipEmptyPassword && password == "" {
-					continue
-				}
-
 				item := &BruteItem{
-					AllowBlankUsername: b.config.AllowBlankUsername,
-					AllowBlankPassword: b.config.AllowBlankPassword,
 					Type:               target.Type,
 					Target:             target.Host,
 					Port:               target.Port,

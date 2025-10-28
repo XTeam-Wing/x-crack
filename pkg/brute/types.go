@@ -8,8 +8,6 @@ import (
 
 // BruteItem 表示一个爆破任务项
 type BruteItem struct {
-	AllowBlankUsername bool              `json:"allow_blank_username"` // 是否允许空用户名
-	AllowBlankPassword bool              `json:"allow_blank_password"` // 是否允许空密码
 	Type               string            `json:"type"`                 // 服务类型 (ssh, ftp, mysql, etc.)
 	Target             string            `json:"target"`               // 目标地址
 	Username           string            `json:"username"`             // 用户名
